@@ -1,4 +1,4 @@
-package de.estim8.test.renderer.math;
+package de.estim8.test.math;
 
 /*
  * A speed-improved simplex noise algorithm for 2D, 3D and 4D in Java.

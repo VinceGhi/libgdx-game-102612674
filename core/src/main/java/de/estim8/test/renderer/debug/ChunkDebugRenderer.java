@@ -1,51 +1,43 @@
-package de.estim8.test.renderer;
+package de.estim8.test.renderer.debug;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import de.estim8.test.renderer.block.Chunk;
-import de.estim8.test.renderer.math.IntVector3;
+import de.estim8.test.world.block.Chunk;
+import de.estim8.test.math.IntVector3;
 
 import java.util.List;
 
-import static de.estim8.test.renderer.BlockModel.BLOCK_MODEL_SIZE;
-import static de.estim8.test.renderer.block.Chunk.CHUNK_HEIGHT;
-import static de.estim8.test.renderer.block.Chunk.CHUNK_WIDTH;
+import static de.estim8.test.renderer.world.BlockModel.BLOCK_MODEL_SIZE;
+import static de.estim8.test.world.block.Chunk.CHUNK_HEIGHT;
+import static de.estim8.test.world.block.Chunk.CHUNK_WIDTH;
 
 public class ChunkDebugRenderer {
     private final ModelBatch modelBatch;
-    private MeshPartBuilder builder;
-    private Model lineModel;
-    private ModelInstance lineModelInstance;
-
-    private List<Chunk> chunks;
-
-    private Vector3 position;
+    private final MeshPartBuilder builder;
+    private final Model lineModel;
+    private final ModelInstance lineModelInstance;
 
     public ChunkDebugRenderer(Chunk chunk) {
         this.modelBatch = new ModelBatch();
 
-        this.position = chunk.getPositionCopy().multiply(CHUNK_WIDTH).getVector3();
-
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         builder = modelBuilder.part("line", GL20.GL_LINES, VertexAttributes.Usage.Position | VertexAttributes.Usage.ColorUnpacked, new Material());
-        builder.setColor(Color.RED);
+        builder.setColor(new Color(1f, 0, 0, 0.2f));
         stuff(chunk);
         lineModel = modelBuilder.end();
         lineModelInstance = new ModelInstance(lineModel);
         Vector3 modelPosition = new Vector3(
-                chunk.getBlock(0, 0, 0).getAbsolutePosition().getX() * BLOCK_MODEL_SIZE,
-                chunk.getBlock(0, 0, 0).getAbsolutePosition().getY() * BLOCK_MODEL_SIZE,
-                chunk.getBlock(0, 0, 0).getAbsolutePosition().getZ() * BLOCK_MODEL_SIZE
+                chunk.getAbsolutePosition().getX() * BLOCK_MODEL_SIZE,
+                chunk.getAbsolutePosition().getY() * BLOCK_MODEL_SIZE,
+                chunk.getAbsolutePosition().getZ() * BLOCK_MODEL_SIZE
         );
         lineModelInstance.transform.set(modelPosition, new Quaternion(0, 0, 0, 0));
     }

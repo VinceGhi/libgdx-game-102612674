@@ -1,4 +1,4 @@
-package de.estim8.test.renderer.base;
+package de.estim8.test.renderer.debug;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

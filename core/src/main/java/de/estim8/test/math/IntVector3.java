@@ -1,7 +1,6 @@
-package de.estim8.test.renderer.math;
+package de.estim8.test.math;
 
 import com.badlogic.gdx.math.Vector3;
-import lombok.Data;
 
 public class IntVector3 {
     private int x, y, z;
