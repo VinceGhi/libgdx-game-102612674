@@ -10,7 +10,6 @@ buildscript {
 	}
 	dependencies {
 
-
 		// This follows advice from https://blog.gradle.org/log4j-vulnerability
 		constraints {
 			classpath("org.apache.logging.log4j:log4j-core") {
@@ -19,6 +18,14 @@ buildscript {
 					prefer("2.17.0")
 				}
 				because("CVE-2021-44228, CVE-2021-45046, CVE-2021-45105: Log4j vulnerable to remote code execution and other critical security vulnerabilities")
+			}
+		}
+
+		constraints {
+			classpath("io.freefair.gradle:lombok-plugin") {
+				version {
+					strictly("3.8.4")
+				}
 			}
 		}
 	}

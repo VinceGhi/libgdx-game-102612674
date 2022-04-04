@@ -2,69 +2,79 @@ package de.estim8.test;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import de.estim8.test.renderer.ChunkDebugRenderer;
+import de.estim8.test.renderer.ChunkRenderer;
+import de.estim8.test.renderer.base.VersionRenderer;
+import de.estim8.test.renderer.block.Block;
+import de.estim8.test.renderer.block.BlockColor;
+import de.estim8.test.renderer.block.Chunk;
+import de.estim8.test.renderer.math.IntVector3;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /** First screen of the application. Displayed after the application is created. */
 public class FirstScreen implements Screen {
 
-	// renderVersion() stuff
-	private SpriteBatch batch;
-	private BitmapFont font;
+	private VersionRenderer versionRenderer;
 
 	// model stuff
-	private PerspectiveCamera cam;
-	private ModelBatch modelBatch;
-	private Model model;
-	private ModelInstance instance;
-
-	// lighting
-	private Environment environment;
-
-	// camera controller
+	private PerspectiveCamera camera;
 	private CameraInputController camController;
+
+	private final List<ChunkRenderer> chunkRenderers = new ArrayList<>();
+	private final List<Chunk> chunks = new ArrayList<>();
+	private final List<ChunkDebugRenderer> chunkDebugRenderers = new ArrayList<>();
+
 
 
 	@Override
 	public void show() {
-		// Prepare your screen here.
-		batch = new SpriteBatch();
-		font = new BitmapFont();
-
-		// lightning
-		environment = new Environment();
-		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-		environment.add(new DirectionalLight().set(0.4f, 0.4f, 0.4f, -1f, -0.8f, -0.2f));
-
-		// model batch renderer
-		modelBatch = new ModelBatch();
+		versionRenderer = new VersionRenderer();
 
 		// setup camera
-		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		cam.position.set(10f, 10f, 10f);
-		cam.lookAt(0,0,0);
-		cam.near = 1f;
-		cam.far = 300f;
-		cam.update();
+		camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		camera.position.set(10f, 10f, 10f);
+		camera.lookAt(0,0,0);
+		camera.near = 1f;
+		camera.far = 300f;
+		camera.update();
 
 		// camera controller
-		camController = new CameraInputController(cam);
+		camController = new CameraInputController(camera);
 		Gdx.input.setInputProcessor(camController);
 
-		// add cube
-		ModelBuilder modelBuilder = new ModelBuilder();
-		model = modelBuilder.createBox(1f, 1f, 1f, new Material(ColorAttribute.createDiffuse(Color.GREEN)), VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-		instance = new ModelInstance(model);
+		int tmpChunks = 1;
+		for (int x = -tmpChunks; x < tmpChunks; x++) {
+			for (int z = -tmpChunks; z < tmpChunks; z++) {
+				chunks.add(new Chunk(new IntVector3(x, 0, z)));
+			}
+		}
+
+//		chunks.add(new Chunk(new IntVector3(0, 0, 0)));
+//		chunks.add(new Chunk(new IntVector3(0, 0, 1)));
+
+		for (int x = 0; x < Chunk.CHUNK_WIDTH; x++) {
+			for (int y = 0; y < Chunk.CHUNK_HEIGHT; y++) {
+				for (int z = 0; z < Chunk.CHUNK_WIDTH; z++) {
+					if (y <= Chunk.CHUNK_HEIGHT / 3) {
+						final IntVector3 position = new IntVector3(x, y, z);
+						chunks.forEach(chunk -> chunk.addBlock(position, BlockColor.GREEN));
+					}
+				}
+			}
+		}
+
+		chunks.forEach(chunk -> chunkRenderers.add(new ChunkRenderer(chunk)));
+
+		chunks.forEach(c -> {
+			chunkDebugRenderers.add(new ChunkDebugRenderer(c));
+		});
+
 	}
 
 	@Override
@@ -73,16 +83,12 @@ public class FirstScreen implements Screen {
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-		// render version
-		renderVersion();
+		versionRenderer.render();
 
 		// camera controller
 		camController.update();
-
-		// render model and lightning stuff
-		modelBatch.begin(cam);
-		modelBatch.render(instance, environment);
-		modelBatch.end();
+		chunkRenderers.forEach(c -> c.render(camera));
+		chunkDebugRenderers.forEach(c -> c.render(camera));
 	}
 
 	@Override
@@ -107,19 +113,8 @@ public class FirstScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		// dispose renderVersion() shit
-		batch.dispose();
-		font.dispose();
-
-		// dispose model stuff
-		modelBatch.dispose();
-		model.dispose();
-	}
-
-	private void renderVersion() {
-		batch.begin();
-		font.setColor(1f, 1f, 1f, 0.25f);
-		font.draw(batch, "v0.0.1-alpha", 10, Gdx.graphics.getHeight() - 10);
-		batch.end();
+		chunkRenderers.forEach(ChunkRenderer::dispose);
+		chunkDebugRenderers.forEach(ChunkDebugRenderer::dispose);
+		versionRenderer.dispose();
 	}
 }

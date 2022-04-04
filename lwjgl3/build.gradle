@@ -1,7 +1,7 @@
 apply plugin: 'application'
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-mainClassName = 'de.estim8.test.lwjgl3.Lwjgl3Launcher'
+mainClassName = 'de.estim8.test.lwjgl3.GameLauncher'
 eclipse.project.name = appName + '-lwjgl3'
 sourceCompatibility = 1.8
 
@@ -9,6 +9,7 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 	implementation project(':core')
+	implementation 'org.projectlombok:lombok:1.18.22'
 }
 
 def os = System.properties['os.name'].toLowerCase()

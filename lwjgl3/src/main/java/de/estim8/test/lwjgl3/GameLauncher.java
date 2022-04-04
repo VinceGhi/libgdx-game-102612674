@@ -1,14 +1,11 @@
 package de.estim8.test.lwjgl3;
 
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import de.estim8.test.GameMain;
 
-import java.awt.*;
-
 /** Launches the desktop (LWJGL3) application. */
-public class Lwjgl3Launcher {
+public class GameLauncher {
 	public static void main(String[] args) {
 		createApplication();
 	}
